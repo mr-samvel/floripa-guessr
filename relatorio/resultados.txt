@@ -1,0 +1,60 @@
+1.
+GRID_ROWS, GRID_COLS = 15, 5 (75)
+Cell   0: 240 images
+Cell   1: 8 images
+Cell   5: 51 images
+Cell   6: 113 images
+Cell   7: 7 images
+Cell  10: 70 images
+Cell  11: 191 images
+Cell  12: 82 images
+Cell  15: 13 images
+Cell  16: 47 images
+Cell  17: 78 images
+Cell  20: 36 images
+Cell  21: 288 images
+Cell  22: 330 images
+Cell  25: 59 images
+Cell  26: 386 images
+Cell  27: 511 images
+Cell  31: 142 images
+Cell  32: 187 images
+Cell  33: 8 images
+Cell  35: 552 images
+Cell  36: 646 images
+Cell  37: 431 images
+Cell  38: 95 images
+Cell  40: 567 images
+Cell  41: 560 images
+Cell  42: 299 images
+Cell  43: 162 images
+Cell  46: 107 images
+Cell  47: 213 images
+Cell  48: 81 images
+Cell  51: 148 images
+Cell  52: 132 images
+Cell  53: 168 images
+Cell  54: 6 images
+Cell  56: 138 images
+Cell  57: 210 images
+Cell  58: 373 images
+Cell  59: 148 images
+Cell  61: 96 images
+Cell  62: 401 images
+Cell  63: 411 images
+Cell  64: 434 images
+Cell  65: 81 images
+Cell  66: 26 images
+Cell  67: 125 images
+Cell  68: 331 images
+Cell  69: 219 images
+Cell  70: 215 images
+Cell  71: 10 images
+Cell  73: 139 images
+
+epoch     train_loss  valid_loss  accuracy  top_k_accuracy  time
+0         5.750233    4.636654    0.015422  0.058795        12:48
+1         5.721434    4.638364    0.017831  0.062651        13:12
+2         5.721784    4.642076    0.020723  0.063614        12:47
+
+2.

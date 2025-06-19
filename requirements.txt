@@ -2,5 +2,6 @@ python-dotenv
 pandas
 numpy
 scikit-learn
-torch-directml
+# torch-directml
 fastai
+opencv-python
