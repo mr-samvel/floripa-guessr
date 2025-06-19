@@ -41,7 +41,7 @@ def create_balanced_grid_overlay(image_path, grid_bounds_path, output_path):
         center_x = (x1 + x2) // 2
         center_y = (y1 + y2) // 2
         
-        text = str(cell_id)
+        text = str(int(cell_id))
         if font:
             bbox = draw.textbbox((0, 0), text, font=font)
             text_width = bbox[2] - bbox[0]
@@ -78,7 +78,7 @@ def main():
     base, ext = os.path.splitext(input_path)
     output_path = f"{base}_balanced_grid{ext}"
     
-    grid_bounds_path = os.path.join('manifests', 'grid_bounds.csv')
+    grid_bounds_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'manifests', 'grid_bounds.csv')
     
     if not os.path.exists(grid_bounds_path):
         print(f"Error: {grid_bounds_path} not found")

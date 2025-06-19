@@ -7,42 +7,89 @@ load_dotenv()
 
 LAT_MIN, LAT_MAX = -27.843357, -27.374617
 LNG_MIN, LNG_MAX = -48.611627, -48.35722
-GRID_ROWS, GRID_COLS = 15, 5
+TARGET_CELLS = 30
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMGS_DIR = os.path.join(BASE_DIR, 'images')
 MANIFEST_DIR = os.path.join(BASE_DIR, 'manifests')
-TRAIN_DIR  = os.path.join(IMGS_DIR, "by_cell_train")
-VALID_DIR  = os.path.join(IMGS_DIR, "by_cell_valid")
+TRAIN_DIR = os.path.join(IMGS_DIR, "by_cell_train")
+VALID_DIR = os.path.join(IMGS_DIR, "by_cell_valid")
 
 MANIFEST_PATH = os.path.join(MANIFEST_DIR, 'manifest.csv')
 T_MANIFEST_PATH = os.path.join(MANIFEST_DIR, 'training_manifest.csv')
 V_MANIFEST_PATH = os.path.join(MANIFEST_DIR, 'validation_manifest.csv')
+GRID_BOUNDS_PATH = os.path.join(MANIFEST_DIR, 'grid_bounds.csv')
 
-def coord_to_label(lat, lng):
-    '''
-    Converte um conjunto de coordenadas (lat,lng) em um intervalo discreto delimitado pelo grid (GRID_ROWS, GRID_COLS).
-    A label resultante é um valor inteiro que indica a célula (em 1D) a qual a coordenada pertence no grid.
-    O intervalo da label é dado por 0..GRID_ROWS*GRID_COLS-1.
-    '''
+def create_balanced_grid(data, target_cells):
+    n_samples = len(data)
+    target_per_cell = n_samples / target_cells
+    
+    sorted_data = data.sort_values(['lat', 'lng']).reset_index(drop=True)
+    
+    cell_bounds = []
+    cell_assignments = []
+    current_cell = 0
+    samples_in_current_cell = 0
+    
+    cell_start_idx = 0
+    
+    for i, row in sorted_data.iterrows():
+        samples_in_current_cell += 1
+        
+        should_close = (
+            samples_in_current_cell >= target_per_cell and 
+            current_cell < target_cells - 1
+        ) or i == len(sorted_data) - 1
+        
+        if should_close:
+            cell_data = sorted_data.iloc[cell_start_idx:i+1]
+            
+            bounds = {
+                'cell_id': current_cell,
+                'lat_min': cell_data['lat'].min(),
+                'lat_max': cell_data['lat'].max(),
+                'lng_min': cell_data['lng'].min(),
+                'lng_max': cell_data['lng'].max(),
+                'sample_count': len(cell_data)
+            }
+            cell_bounds.append(bounds)
+            
+            for j in range(cell_start_idx, i+1):
+                cell_assignments.append(current_cell)
+            
+            current_cell += 1
+            cell_start_idx = i + 1
+            samples_in_current_cell = 0
+    
+    return cell_bounds, cell_assignments
+
+def coord_to_balanced_label(lat, lng, cell_bounds):
     lat = min(max(lat, LAT_MIN), LAT_MAX)
     lng = min(max(lng, LNG_MIN), LNG_MAX)
-
-    # normaliza coordenadas em intervalo [0, 1]
-    row_frac = (lat - LAT_MIN) / (LAT_MAX - LAT_MIN)
-    col_frac = (lng - LNG_MIN) / (LNG_MAX - LNG_MIN)
-
-    row = int(row_frac * GRID_ROWS)
-    col = int(col_frac * GRID_COLS)
-
-    if row == GRID_ROWS: row -= 1
-    if col == GRID_COLS: col -= 1
-
-    return row * GRID_COLS + col
+    
+    for bounds in cell_bounds:
+        if (bounds['lat_min'] <= lat <= bounds['lat_max'] and 
+            bounds['lng_min'] <= lng <= bounds['lng_max']):
+            return bounds['cell_id']
+    
+    min_dist = float('inf')
+    closest_cell = 0
+    
+    for bounds in cell_bounds:
+        center_lat = (bounds['lat_min'] + bounds['lat_max']) / 2
+        center_lng = (bounds['lng_min'] + bounds['lng_max']) / 2
+        dist = ((lat - center_lat) ** 2 + (lng - center_lng) ** 2) ** 0.5
+        
+        if dist < min_dist:
+            min_dist = dist
+            closest_cell = bounds['cell_id']
+    
+    return closest_cell
 
 def build_folders(split_data, out_dir):
     for cell in split_data['cell'].unique():
         os.makedirs(os.path.join(out_dir, str(cell)), exist_ok=True)
+    
     for _, row in split_data.iterrows():
         src = row['file']
         dst = os.path.join(out_dir, str(row['cell']), os.path.basename(src))
@@ -57,23 +104,43 @@ def main():
     data = pd.read_csv(MANIFEST_PATH)
     n_samples = len(data)
     print(f'Found {n_samples} entries in the manifest file')
-
-    data['cell'] = data.apply(lambda r: coord_to_label(r.lat, r.lng), axis=1)
-    # se houver, remove pontos fora dos limites
-    data = data.dropna(subset=["cell"]).reset_index(drop=True)
-    data["cell"] = data["cell"].astype(int)
     
-    print('Converted coordinates to labels')
-    cell_counts = data["cell"].value_counts().sort_index()
+    data = data.dropna(subset=['lat', 'lng'])
+    data = data[(data['lat'] >= LAT_MIN) & (data['lat'] <= LAT_MAX)]
+    data = data[(data['lng'] >= LNG_MIN) & (data['lng'] <= LNG_MAX)]
+    data = data.reset_index(drop=True)
+    
+    print(f'Creating balanced grid with {TARGET_CELLS} cells...')
+    
+    cell_bounds, cell_assignments = create_balanced_grid(data, TARGET_CELLS)
+    
+    data['cell'] = cell_assignments
+    
+    bounds_df = pd.DataFrame(cell_bounds)
+    bounds_df.to_csv(GRID_BOUNDS_PATH, index=False)
+    print(f'Grid bounds saved to {GRID_BOUNDS_PATH}')
+    
+    print('\nCell distribution:')
+    cell_counts = data['cell'].value_counts().sort_index()
+    print(f'Mean: {cell_counts.mean():.1f}, Std: {cell_counts.std():.1f}')
+    
     for cell, count in cell_counts.items():
-        print(f"Cell {cell:>3}: {count} images")
-
+        bounds = cell_bounds[cell]
+        lat_size = bounds['lat_max'] - bounds['lat_min']
+        lng_size = bounds['lng_max'] - bounds['lng_min']
+        print(f"Cell {cell:>2}: {count:>3} samples, "
+              f"size: {lat_size:.4f}° × {lng_size:.4f}°")
+    
     train_data, valid_data = train_test_split(data, test_size=0.2, stratify=data['cell'], random_state=0)
+    
     train_data.to_csv(T_MANIFEST_PATH, index=False)
     valid_data.to_csv(V_MANIFEST_PATH, index=False)
-
-    build_folders(train_data, TRAIN_DIR)
-    build_folders(valid_data, VALID_DIR)
+    
+    # build_folders(train_data, TRAIN_DIR)
+    # build_folders(valid_data, VALID_DIR)
+    
+    print(f'\nTraining samples: {len(train_data)}')
+    print(f'Validation samples: {len(valid_data)}')
 
 if __name__ == '__main__':
     main()
