@@ -69,14 +69,18 @@ def create_balanced_grid_overlay(image_path, grid_bounds_path, output_path):
 def main():
     import sys
     
-    if len(sys.argv) != 2:
-        print("Usage: python balanced_grid_overlay.py <input_image>")
-        print("Note: Requires grid_bounds.csv in manifests/ directory")
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print("Usage: python balanced_grid_overlay.py <input_image> [output_image]")
+        print("Note: Requires grid_bounds.csv in ../manifests/ directory")
         return
     
     input_path = sys.argv[1]
-    base, ext = os.path.splitext(input_path)
-    output_path = f"{base}_balanced_grid{ext}"
+    
+    if len(sys.argv) == 3:
+        output_path = sys.argv[2]
+    else:
+        base, ext = os.path.splitext(input_path)
+        output_path = f"{base}_overlay{ext}"
     
     grid_bounds_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'manifests', 'grid_bounds.csv')
     

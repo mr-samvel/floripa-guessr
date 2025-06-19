@@ -2,12 +2,13 @@ import os
 import pandas as pd
 from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
+from sklearn.cluster import KMeans
 
 load_dotenv()
 
 LAT_MIN, LAT_MAX = -27.843357, -27.374617
 LNG_MIN, LNG_MAX = -48.611627, -48.35722
-TARGET_CELLS = 30
+TARGET_CELLS = 40
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMGS_DIR = os.path.join(BASE_DIR, 'images')
@@ -21,47 +22,35 @@ V_MANIFEST_PATH = os.path.join(MANIFEST_DIR, 'validation_manifest.csv')
 GRID_BOUNDS_PATH = os.path.join(MANIFEST_DIR, 'grid_bounds.csv')
 
 def create_balanced_grid(data, target_cells):
-    n_samples = len(data)
-    target_per_cell = n_samples / target_cells
+    coords = data[['lat', 'lng']].values
     
-    sorted_data = data.sort_values(['lat', 'lng']).reset_index(drop=True)
+    lat_range = LAT_MAX - LAT_MIN
+    lng_range = LNG_MAX - LNG_MIN
+    coords_norm = coords.copy()
+    coords_norm[:, 0] = (coords[:, 0] - LAT_MIN) / lat_range
+    coords_norm[:, 1] = (coords[:, 1] - LNG_MIN) / lng_range
+    
+    kmeans = KMeans(n_clusters=target_cells, random_state=42, n_init=10)
+    cell_assignments = kmeans.fit_predict(coords_norm)
     
     cell_bounds = []
-    cell_assignments = []
-    current_cell = 0
-    samples_in_current_cell = 0
-    
-    cell_start_idx = 0
-    
-    for i, row in sorted_data.iterrows():
-        samples_in_current_cell += 1
-        
-        should_close = (
-            samples_in_current_cell >= target_per_cell and 
-            current_cell < target_cells - 1
-        ) or i == len(sorted_data) - 1
-        
-        if should_close:
-            cell_data = sorted_data.iloc[cell_start_idx:i+1]
+    for cell_id in range(target_cells):
+        cell_mask = cell_assignments == cell_id
+        if not cell_mask.any():
+            continue
             
-            bounds = {
-                'cell_id': current_cell,
-                'lat_min': cell_data['lat'].min(),
-                'lat_max': cell_data['lat'].max(),
-                'lng_min': cell_data['lng'].min(),
-                'lng_max': cell_data['lng'].max(),
-                'sample_count': len(cell_data)
-            }
-            cell_bounds.append(bounds)
-            
-            for j in range(cell_start_idx, i+1):
-                cell_assignments.append(current_cell)
-            
-            current_cell += 1
-            cell_start_idx = i + 1
-            samples_in_current_cell = 0
+        cell_coords = coords[cell_mask]
+        bounds = {
+            'cell_id': cell_id,
+            'lat_min': cell_coords[:, 0].min(),
+            'lat_max': cell_coords[:, 0].max(),
+            'lng_min': cell_coords[:, 1].min(),
+            'lng_max': cell_coords[:, 1].max(),
+            'sample_count': cell_mask.sum()
+        }
+        cell_bounds.append(bounds)
     
-    return cell_bounds, cell_assignments
+    return cell_bounds, cell_assignments.tolist()
 
 def coord_to_balanced_label(lat, lng, cell_bounds):
     lat = min(max(lat, LAT_MIN), LAT_MAX)
