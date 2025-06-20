@@ -57,4 +57,84 @@ epoch     train_loss  valid_loss  accuracy  top_k_accuracy  time
 1         5.721434    4.638364    0.017831  0.062651        13:12
 2         5.721784    4.642076    0.020723  0.063614        12:47
 
-2.
+2. balanced_grid
+Cell distribution:
+Mean: 345.7, Std: 1.6
+Cell  0: 346 samples, size: 0.0585° × 0.0867°
+Cell  1: 346 samples, size: 0.0310° × 0.0967°
+Cell  2: 346 samples, size: 0.0477° × 0.0680°
+Cell  3: 346 samples, size: 0.0152° × 0.0834°
+Cell  4: 346 samples, size: 0.0069° × 0.0876°
+Cell  5: 346 samples, size: 0.0130° × 0.0840°
+Cell  6: 346 samples, size: 0.0108° × 0.0720°
+Cell  7: 346 samples, size: 0.0275° × 0.0901°
+Cell  8: 346 samples, size: 0.0213° × 0.1646°
+Cell  9: 346 samples, size: 0.0047° × 0.1629°
+Cell 10: 346 samples, size: 0.0052° × 0.1789°
+Cell 11: 346 samples, size: 0.0032° × 0.1794°
+Cell 12: 346 samples, size: 0.0034° × 0.1836°
+Cell 13: 346 samples, size: 0.0036° × 0.1859°
+Cell 14: 346 samples, size: 0.0040° × 0.1782°
+Cell 15: 346 samples, size: 0.0057° × 0.1820°
+Cell 16: 346 samples, size: 0.0057° × 0.1874°
+Cell 17: 346 samples, size: 0.0157° × 0.1888°
+Cell 18: 346 samples, size: 0.0324° × 0.0984°
+Cell 19: 346 samples, size: 0.0226° × 0.1178°
+Cell 20: 346 samples, size: 0.0173° × 0.1410°
+Cell 21: 346 samples, size: 0.0088° × 0.1397°
+Cell 22: 346 samples, size: 0.0148° × 0.1556°
+Cell 23: 346 samples, size: 0.0116° × 0.1708°
+Cell 24: 346 samples, size: 0.0050° × 0.1654°
+Cell 25: 346 samples, size: 0.0050° × 0.1624°
+Cell 26: 346 samples, size: 0.0076° × 0.1386°
+Cell 27: 346 samples, size: 0.0066° × 0.1967°
+Cell 28: 346 samples, size: 0.0243° × 0.2019°
+Cell 29: 337 samples, size: 0.0283° × 0.1991°
+
+epoch     train_loss  valid_loss  accuracy  top_k_accuracy  time
+0         5.103023    4.072146    0.032289  0.108434        13:18
+1         5.101265    4.038980    0.035663  0.108434        13:22
+2         5.098484    4.015220    0.040753  0.108434        13:45
+
+3. kmeans cells 30
+
+Cell distribution:
+Mean: 345.7, Std: 176.0
+Cell  0: 232 samples, size: 0.0593° × 0.0344°
+Cell  1: 299 samples, size: 0.0329° × 0.0332°
+Cell  2: 472 samples, size: 0.0428° × 0.0362°
+Cell  3: 391 samples, size: 0.0358° × 0.0196°
+Cell  4: 140 samples, size: 0.0573° × 0.0550°
+Cell  5: 192 samples, size: 0.0273° × 0.0245°
+Cell  6: 425 samples, size: 0.0531° × 0.0331°
+Cell  7: 283 samples, size: 0.0466° × 0.0318°
+Cell  8: 232 samples, size: 0.0182° × 0.0244°
+Cell  9: 319 samples, size: 0.0836° × 0.0269°
+Cell 10: 479 samples, size: 0.0752° × 0.0363°
+Cell 11: 346 samples, size: 0.0377° × 0.0309°
+Cell 12: 636 samples, size: 0.0629° × 0.0241°
+Cell 13: 272 samples, size: 0.0589° × 0.0284°
+Cell 14: 697 samples, size: 0.0406° × 0.0314°
+Cell 15: 175 samples, size: 0.0330° × 0.0262°
+Cell 16: 675 samples, size: 0.0638° × 0.0322°
+Cell 17: 523 samples, size: 0.0434° × 0.0317°
+Cell 18: 629 samples, size: 0.0620° × 0.0325°
+Cell 19: 351 samples, size: 0.0597° × 0.0386°
+Cell 20: 129 samples, size: 0.0581° × 0.0270°
+Cell 21:  88 samples, size: 0.0578° × 0.0165°
+Cell 22: 262 samples, size: 0.0595° × 0.0345°
+Cell 23: 166 samples, size: 0.0562° × 0.0243°
+Cell 24: 348 samples, size: 0.0403° × 0.0285°
+Cell 25: 116 samples, size: 0.0544° × 0.0361°
+Cell 26: 237 samples, size: 0.0536° × 0.0357°
+Cell 27: 226 samples, size: 0.0401° × 0.0295°
+Cell 28: 459 samples, size: 0.0352° × 0.0229°
+Cell 29: 572 samples, size: 0.0498° × 0.0246°
+
+Training samples: 8296
+Validation samples: 2075
+
+epoch     train_loss  valid_loss  accuracy  top_k_accuracy  time    
+0         5.048744    4.054729    0.026988  0.107952        14:57
+1         5.075758    4.085825    0.024096  0.100723        15:51
+2         5.082394    4.050846    0.033253  0.097831        14:57

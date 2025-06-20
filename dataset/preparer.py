@@ -8,7 +8,7 @@ load_dotenv()
 
 LAT_MIN, LAT_MAX = -27.843357, -27.374617
 LNG_MIN, LNG_MAX = -48.611627, -48.35722
-TARGET_CELLS = 40
+TARGET_CELLS = 30
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMGS_DIR = os.path.join(BASE_DIR, 'images')
@@ -75,20 +75,6 @@ def coord_to_balanced_label(lat, lng, cell_bounds):
     
     return closest_cell
 
-def build_folders(split_data, out_dir):
-    for cell in split_data['cell'].unique():
-        os.makedirs(os.path.join(out_dir, str(cell)), exist_ok=True)
-    
-    for _, row in split_data.iterrows():
-        src = row['file']
-        dst = os.path.join(out_dir, str(row['cell']), os.path.basename(src))
-        if os.path.exists(dst):
-            continue
-        try:
-            os.symlink(os.path.abspath(src), dst)
-        except OSError as e:
-            print(f'Could not copy {src} to {dst}: {e}')
-
 def main():
     data = pd.read_csv(MANIFEST_PATH)
     n_samples = len(data)
@@ -124,9 +110,6 @@ def main():
     
     train_data.to_csv(T_MANIFEST_PATH, index=False)
     valid_data.to_csv(V_MANIFEST_PATH, index=False)
-    
-    # build_folders(train_data, TRAIN_DIR)
-    # build_folders(valid_data, VALID_DIR)
     
     print(f'\nTraining samples: {len(train_data)}')
     print(f'Validation samples: {len(valid_data)}')

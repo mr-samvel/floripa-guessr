@@ -7,9 +7,9 @@ MANIFESTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datase
 TRAIN_CSV = os.path.join(MANIFESTS_DIR, "training_manifest.csv")
 VALID_CSV = os.path.join(MANIFESTS_DIR, "validation_manifest.csv")
 
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 IMG_CROP_SIZE = 224
-NUM_WORKERS = 8
+NUM_WORKERS = 16
 ###
 
 def build_datablock():
