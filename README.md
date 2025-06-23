@@ -63,3 +63,7 @@ Jupyter notebook that:
 - Uses fast.ai framework with EfficientNet-B4 architecture
 - Performs image preprocessing (transforms) before training
 - Saves checkpoints and exports to `models/` directory
+
+## Models
+
+You can access the exported models and weights in the releases.

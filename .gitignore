@@ -2,5 +2,4 @@
 dataset/images
 dataset/manifests
 relatorio/
-**/*.pth
-!models/checkpoint*
+models/
