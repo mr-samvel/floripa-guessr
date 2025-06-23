@@ -1,3 +1,6 @@
 .env
 dataset/images
 dataset/manifests
+relatorio/
+**/*.pth
+!models/checkpoint*
