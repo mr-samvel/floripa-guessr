@@ -1,7 +1,0 @@
-python-dotenv
-pandas
-numpy
-scikit-learn
-# torch-directml
-fastai
-opencv-python
